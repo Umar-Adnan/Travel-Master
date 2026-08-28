@@ -1,0 +1,75 @@
+<% content_for :title, "Destination Weather & Travel Advisories - TravelMaster" %>
+
+<div class="container">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🌦️ Destination Weather & Travel Advisories</h1>
+      <p class="section-subtitle">Real-time temperature forecasts, precipitation risks, and packing guidance across destinations</p>
+    </div>
+  </div>
+
+  <!-- Severe Advisories Banner if any -->
+  <% if @severe_advisories.any? %>
+    <div style="background: #fffbeb; border: 1px solid #fde68a; border-left: 5px solid var(--warning); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2.5rem;">
+      <h2 style="font-size: 1.2rem; font-weight: 700; color: #92400e; margin-bottom: 0.75rem;">⚠️ Active Weather Warnings & Advisories</h2>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <% @severe_advisories.each do |adv| %>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+            <span>
+              <strong><%= adv.destination.name %>:</strong> <%= adv.travel_guidance.presence || "Inclement weather expected. High rainfall probability (#{adv.rainfall_prob}%)." %>
+            </span>
+            <span class="badge badge-warning"><%= adv.advisory_level %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Weather Cards Grid -->
+  <div class="grid-3">
+    <% @destinations.each do |dest| %>
+      <% weather = dest.current_weather %>
+      <div class="card">
+        <div class="card-body">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div>
+              <h2 style="font-size: 1.25rem; font-weight: 700;"><%= link_to dest.name, destination_path(dest) %></h2>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">📍 <%= dest.city %>, <%= dest.country %></div>
+            </div>
+
+            <% if weather %>
+              <div style="font-size: 2.2rem; line-height: 1;">
+                <%= weather.condition_icon %>
+              </div>
+            <% end %>
+          </div>
+
+          <% if weather %>
+            <div style="display: flex; align-items: baseline; gap: 0.75rem; margin: 0.75rem 0;">
+              <span style="font-size: 2rem; font-weight: 800; color: var(--text-main);"><%= weather.temperature_celsius %>°C</span>
+              <span style="font-size: 1rem; color: var(--text-muted);">(<%= weather.temperature_fahrenheit %>°F)</span>
+              <span class="badge badge-primary"><%= weather.condition %></span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; background: var(--bg-page); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.8rem; margin-bottom: 1rem;">
+              <div>💧 Rain Risk: <strong><%= weather.rainfall_prob %>%</strong></div>
+              <div>💨 Wind: <strong><%= weather.wind_speed_kmh %> km/h</strong></div>
+              <div>💦 Humidity: <strong><%= weather.humidity %>%</strong></div>
+              <div>🗓️ Forecast Date: <strong><%= weather.forecast_date.strftime("%b %d") %></strong></div>
+            </div>
+
+            <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+              <%= WeatherService.travel_recommendations_for(dest).truncate(120) %>
+            </p>
+          <% else %>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 1.5rem 0;">Forecast telemetry initializing...</p>
+          <% end %>
+        </div>
+
+        <div class="card-footer">
+          <%= link_to "View 7-Day Extended Forecast →", weather_path(dest), class: "btn btn-primary btn-sm", style: "width: 100%;" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

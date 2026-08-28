@@ -1,0 +1,49 @@
+<% content_for :title, "Manage Destinations - Admin" %>
+
+<div>
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">📍 Destinations Catalog</h1>
+      <p class="section-subtitle">Add and configure destinations, pricing, and attraction data</p>
+    </div>
+    <%= link_to "+ Add New Destination", new_admin_destination_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Destination</th>
+          <th>City, Country</th>
+          <th>Category</th>
+          <th>Base Price/Day</th>
+          <th>Rating</th>
+          <th>Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @destinations.each do |dest| %>
+          <tr>
+            <td><strong><%= dest.name %></strong></td>
+            <td><%= dest.city %>, <%= dest.country %></td>
+            <td><span class="badge badge-muted"><%= dest.category %></span></td>
+            <td>$<%= dest.price %></td>
+            <td>⭐ <%= dest.rating %></td>
+            <td>
+              <span class="badge badge-<%= dest.available? ? 'success' : 'danger' %>">
+                <%= dest.available? ? 'Available' : 'Hidden' %>
+              </span>
+            </td>
+            <td style="text-align: right;">
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <%= link_to "Edit", edit_admin_destination_path(dest), class: "btn btn-outline btn-sm" %>
+                <%= button_to "Delete", admin_destination_path(dest), method: :delete, data: { turbo_confirm: "Delete destination?" }, class: "btn btn-danger btn-sm" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

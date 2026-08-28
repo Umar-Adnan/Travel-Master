@@ -1,0 +1,88 @@
+<% content_for :title, "Admin Dashboard - TravelMaster" %>
+
+<div>
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.25rem;">📊 System Metrics & Management</h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">Live statistics and control center for TravelMaster data entities</p>
+  </div>
+
+  <!-- Metric KPI Cards -->
+  <div class="grid-4" style="margin-bottom: 2.5rem;">
+    <div class="card" style="padding: 1.25rem;">
+      <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted);">Users Registered</span>
+      <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin: 0.25rem 0;"><%= @total_users %></div>
+      <%= link_to "Manage Users →", admin_users_path, style: "font-size: 0.8rem; font-weight: 600;" %>
+    </div>
+
+    <div class="card" style="padding: 1.25rem;">
+      <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted);">Destinations</span>
+      <div style="font-size: 2rem; font-weight: 800; color: var(--accent); margin: 0.25rem 0;"><%= @total_destinations %></div>
+      <%= link_to "Manage Catalog →", admin_destinations_path, style: "font-size: 0.8rem; font-weight: 600;" %>
+    </div>
+
+    <div class="card" style="padding: 1.25rem;">
+      <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted);">Trips Planned</span>
+      <div style="font-size: 2rem; font-weight: 800; color: #8b5cf6; margin: 0.25rem 0;"><%= @total_trips %></div>
+      <span style="font-size: 0.8rem; color: var(--text-muted);">Live user itineraries</span>
+    </div>
+
+    <div class="card" style="padding: 1.25rem;">
+      <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted);">Hotels & Stays</span>
+      <div style="font-size: 2rem; font-weight: 800; color: #f59e0b; margin: 0.25rem 0;"><%= @total_hotels %></div>
+      <%= link_to "Manage Hotels →", admin_hotels_path, style: "font-size: 0.8rem; font-weight: 600;" %>
+    </div>
+  </div>
+
+  <!-- Recent Activity Tables -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <!-- Recent Trips -->
+    <div class="card" style="padding: 1.5rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">Recent User Trips Planned</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Trip</th>
+            <th>Traveler</th>
+            <th>Est. Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_trips.each do |trip| %>
+            <tr>
+              <td><strong><%= trip.title %></strong></td>
+              <td><%= trip.user.name %></td>
+              <td>$<%= number_with_precision(trip.total_estimated_cost, precision: 0) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent Alerts -->
+    <div class="card" style="padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">Broadcast Alerts</h3>
+        <%= link_to "+ Broadcast New Alert", new_admin_alert_path, class: "btn btn-primary btn-sm" %>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Title</th>
+            <th>Severity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @active_alerts.each do |alt| %>
+            <tr>
+              <td><%= alt.type_icon %> <%= alt.alert_type %></td>
+              <td><%= alt.title.truncate(30) %></td>
+              <td><span class="badge badge-<%= alt.severity == 'warning' ? 'warning' : 'primary' %>"><%= alt.severity %></span></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

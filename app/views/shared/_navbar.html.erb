@@ -1,0 +1,45 @@
+<header class="navbar">
+  <div class="nav-container">
+    <%= link_to root_path, class: "brand-logo" do %>
+      <span class="globe">🌍</span>
+      <span>Travel<span class="accent">Master</span></span>
+    <% end %>
+
+    <ul class="nav-links">
+      <li><%= link_to "Destinations", destinations_path %></li>
+      <li><%= link_to "Cost Estimator", cost_estimators_path %></li>
+      <li><%= link_to "Hotels", hotels_path %></li>
+      <li><%= link_to "Transportation", transports_path %></li>
+      <li><%= link_to "Routes", routes_path %></li>
+      <li><%= link_to "Weather", weather_index_path %></li>
+      <li><%= link_to "Crowd Index", crowds_path %></li>
+      <% if logged_in? %>
+        <li><%= link_to "My Trips", trips_path %></li>
+      <% end %>
+    </ul>
+
+    <div class="nav-actions">
+      <% if logged_in? %>
+        <%= link_to alerts_path, class: "btn btn-outline btn-sm", title: "Notifications" do %>
+          <span>🔔 Alerts</span>
+          <% if unread_alerts_count > 0 %>
+            <span class="badge-counter"><%= unread_alerts_count %></span>
+          <% end %>
+        <% end %>
+
+        <%= link_to profile_path, class: "btn btn-secondary btn-sm" do %>
+          <span>👤 <%= current_user.name.split.first %></span>
+        <% end %>
+
+        <% if current_user.admin? %>
+          <%= link_to "Admin", admin_root_path, class: "btn btn-accent btn-sm" %>
+        <% end %>
+
+        <%= button_to "Log Out", logout_path, method: :delete, class: "btn btn-outline btn-sm", form_class: "d-inline" %>
+      <% else %>
+        <%= link_to "Log In", login_path, class: "btn btn-outline btn-sm" %>
+        <%= link_to "Sign Up", signup_path, class: "btn btn-primary btn-sm" %>
+      <% end %>
+    </div>
+  </div>
+</header>

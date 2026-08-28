@@ -1,0 +1,136 @@
+<% content_for :title, "Trip Cost Estimator - TravelMaster" %>
+
+<div class="container">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">💰 Dynamic Trip Cost Estimator</h1>
+      <p class="section-subtitle">Real-time expense estimation with lodging, transport, fuel & toll allowances, dining, and activities</p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start;">
+    <!-- Calculator Form -->
+    <div class="card" style="padding: 2rem;">
+      <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem;">Configure Your Trip Parameters</h2>
+
+      <%= form_with url: cost_estimators_path, method: :get, local: true do |f| %>
+        <div class="form-group">
+          <%= f.label :origin_city, "Starting Departure City", class: "form-label" %>
+          <%= f.text_field :origin_city, value: @origin_city, class: "form-control", placeholder: "e.g. New York, London, Tokyo, Islamabad" %>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Destination(s)</label>
+          <div style="max-height: 220px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; background: white;">
+            <% @destinations.each do |dest| %>
+              <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0; font-size: 0.9rem; cursor: pointer;">
+                <input type="checkbox" name="destination_ids[]" value="<%= dest.id %>" <%= "checked" if @selected_destination_ids.map(&:to_s).include?(dest.id.to_s) %>>
+                <span><strong><%= dest.name %></strong> (<%= dest.city %>, <%= dest.country %>) - $<%= dest.price %>/day</span>
+              </label>
+            <% end %>
+          </div>
+          <div class="form-help">Select one or multiple cities to plan a single or multi-stop vacation.</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <%= f.label :duration_days, "Trip Duration (Days)", class: "form-label" %>
+            <%= f.number_field :duration_days, value: @duration_days, min: 1, max: 90, class: "form-control" %>
+          </div>
+
+          <div class="form-group">
+            <%= f.label :travelers, "Number of Travelers", class: "form-label" %>
+            <%= f.number_field :travelers, value: @travelers, min: 1, max: 50, class: "form-control" %>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <%= f.label :travel_tier, "Travel Comfort Tier", class: "form-label" %>
+            <%= f.select :travel_tier, [["Budget ($25/day food, economy stays)", "budget"], ["Moderate ($55/day food, 3-4★ hotels)", "moderate"], ["Luxury ($120/day food, 5★ resorts)", "luxury"]], { selected: @travel_tier }, class: "form-control" %>
+          </div>
+
+          <div class="form-group">
+            <%= f.label :transport_mode, "Primary Transportation", class: "form-label" %>
+            <%= f.select :transport_mode, [["Flights", "flight"], ["High-Speed Trains", "train"], ["Rental Car / Drive", "car rental"], ["Intercity Bus", "bus"]], { selected: @transport_mode }, class: "form-control" %>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <%= f.submit "🔄 Calculate Instant Estimate", class: "btn btn-primary btn-lg", style: "width: 100%;" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Live Estimate Results Panel -->
+    <div>
+      <div class="card" style="padding: 2rem; background: white;">
+        <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem;">Estimated Expense Breakdown</h2>
+
+        <!-- Grand Total Metric -->
+        <div class="estimate-metric-box" style="margin-bottom: 1.5rem;">
+          <div class="estimate-metric-label">Estimated Total Trip Cost</div>
+          <div class="estimate-metric-number">$<%= number_with_precision(@estimate_result[:grand_total], precision: 2) %></div>
+          <div style="font-size: 0.95rem; color: #1e40af;">
+            ~$<%= number_with_precision(@estimate_result[:per_person], precision: 2) %> per traveler (<%= @travelers %> <%= "person".pluralize(@travelers) %>, <%= @duration_days %> days)
+          </div>
+        </div>
+
+        <!-- Itemized Table -->
+        <table class="data-table" style="margin-bottom: 1.5rem;">
+          <thead>
+            <tr>
+              <th>Expense Category</th>
+              <th style="text-align: right;">Estimated Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>🏨 Accommodations (<%= @duration_days %> nights)</td>
+              <td style="text-align: right; font-weight: 700;">$<%= number_with_precision(@estimate_result[:breakdown][:lodging], precision: 2) %></td>
+            </tr>
+            <tr>
+              <td>🚗 Transportation & Fares</td>
+              <td style="text-align: right; font-weight: 700;">$<%= number_with_precision(@estimate_result[:breakdown][:transport], precision: 2) %></td>
+            </tr>
+            <tr>
+              <td>🍽️ Food & Dining Allowances</td>
+              <td style="text-align: right; font-weight: 700;">$<%= number_with_precision(@estimate_result[:breakdown][:food], precision: 2) %></td>
+            </tr>
+            <tr>
+              <td>🎟️ Sightseeing, Tours & Activities</td>
+              <td style="text-align: right; font-weight: 700;">$<%= number_with_precision(@estimate_result[:breakdown][:activities], precision: 2) %></td>
+            </tr>
+            <tr>
+              <td>⛽ Road Tolls, Transfers & Fuel</td>
+              <td style="text-align: right; font-weight: 700;">$<%= number_with_precision(@estimate_result[:breakdown][:fuel_and_tolls], precision: 2) %></td>
+            </tr>
+            <tr style="background: #f8fafc;">
+              <td>🛡️ Contingency & Incidentals Buffer (8%)</td>
+              <td style="text-align: right; font-weight: 700; color: var(--text-muted);">$<%= number_with_precision(@estimate_result[:breakdown][:contingency_buffer], precision: 2) %></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Direct Conversion to Trip -->
+        <% if logged_in? %>
+          <%= form_with url: cost_estimators_path, method: :post, local: true do |f| %>
+            <%= hidden_field_tag :duration_days, @duration_days %>
+            <%= hidden_field_tag :travelers, @travelers %>
+            <%= hidden_field_tag :travel_tier, @travel_tier %>
+            <%= hidden_field_tag :transport_mode, @transport_mode %>
+            <% @selected_destination_ids.each do |id| %>
+              <%= hidden_field_tag "destination_ids[]", id %>
+            <% end %>
+            <%= f.submit "✨ Convert This Estimate into a Trip Plan", class: "btn btn-accent btn-lg", style: "width: 100%;" %>
+          <% end %>
+        <% else %>
+          <div style="text-align: center; padding: 1rem; background: var(--bg-page); border-radius: var(--radius-md);">
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem;">Want to save this budget to your account?</p>
+            <%= link_to "Log In to Save Itinerary", login_path, class: "btn btn-primary btn-sm" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+<% content_for :title, "Manage Hotels - Admin" %>
+
+<div>
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🏨 Hotels Management</h1>
+      <p class="section-subtitle">Manage partner hotels, room availability, and price rates</p>
+    </div>
+    <%= link_to "+ Add New Hotel", new_admin_hotel_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Hotel</th>
+          <th>Destination</th>
+          <th>Type</th>
+          <th>Stars</th>
+          <th>Nightly Rate</th>
+          <th>Rooms</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @hotels.each do |hotel| %>
+          <tr>
+            <td><strong><%= hotel.name %></strong></td>
+            <td><%= hotel.destination.name %></td>
+            <td><span class="badge badge-muted"><%= hotel.hotel_type %></span></td>
+            <td><%= "★" * hotel.star_rating %></td>
+            <td><strong>$<%= hotel.price_per_night %></strong></td>
+            <td><%= hotel.available_rooms %></td>
+            <td style="text-align: right;">
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <%= link_to "Edit", edit_admin_hotel_path(hotel), class: "btn btn-outline btn-sm" %>
+                <%= button_to "Delete", admin_hotel_path(hotel), method: :delete, data: { turbo_confirm: "Delete hotel?" }, class: "btn btn-danger btn-sm" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

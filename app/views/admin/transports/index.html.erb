@@ -1,0 +1,45 @@
+<% content_for :title, "Manage Transport - Admin" %>
+
+<div>
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🚗 Transport & Route Connections</h1>
+      <p class="section-subtitle">Manage flight schedules, trains, rental fleets, and fares</p>
+    </div>
+    <%= link_to "+ Add Transport Route", new_admin_transport_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Route</th>
+          <th>Provider</th>
+          <th>Duration</th>
+          <th>Fare</th>
+          <th>Seats</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @transports.each do |t| %>
+          <tr>
+            <td><span class="badge badge-primary"><%= t.type_icon %> <%= t.transport_type %></span></td>
+            <td><strong><%= t.origin_city %> ➔ <%= t.destination_city %></strong></td>
+            <td><%= t.provider_name %></td>
+            <td><%= t.duration_formatted %></td>
+            <td><strong>$<%= t.fare_price %></strong></td>
+            <td><%= t.seats_available %></td>
+            <td style="text-align: right;">
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <%= link_to "Edit", edit_admin_transport_path(t), class: "btn btn-outline btn-sm" %>
+                <%= button_to "Delete", admin_transport_path(t), method: :delete, data: { turbo_confirm: "Delete route?" }, class: "btn btn-danger btn-sm" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

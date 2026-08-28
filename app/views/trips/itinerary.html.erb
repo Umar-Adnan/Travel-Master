@@ -1,0 +1,77 @@
+<% content_for :title, "Day-by-Day Itinerary - #{@trip.title}" %>
+
+<div class="container">
+  <div class="section-header">
+    <div>
+      <%= link_to "← Back to #{@trip.title}", trip_path(@trip), style: "font-size: 0.9rem; font-weight: 600; display: inline-block; margin-bottom: 0.5rem;" %>
+      <h1 class="section-title">🗓️ Day-by-Day Travel Itinerary</h1>
+      <p class="section-subtitle"><%= @trip.duration_days %> Days Schedule (<%= @trip.start_date.strftime("%b %d") %> - <%= @trip.end_date.strftime("%b %d, %Y") %>)</p>
+    </div>
+    <%= link_to "🖨️ Print Itinerary", print_view_trip_path(@trip), class: "btn btn-outline", target: "_blank" %>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <% (0...@trip.duration_days).each do |day_idx| %>
+      <% current_date = @trip.start_date + day_idx.days %>
+      <% dest = @destinations[day_idx % [@destinations.size, 1].max] %>
+
+      <div class="card" style="padding: 1.75rem; border-left: 5px solid var(--primary);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <span class="badge badge-primary">Day <%= day_idx + 1 %></span>
+            <span style="font-size: 1.2rem; font-weight: 700; margin-left: 0.5rem;"><%= current_date.strftime("%A, %B %d, %Y") %></span>
+          </div>
+
+          <% if dest.present? %>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="badge badge-muted">📍 Location: <%= dest.name %> (<%= dest.city %>)</span>
+              <% if dest.current_weather %>
+                <span class="badge badge-primary"><%= dest.current_weather.condition_icon %> <%= dest.current_weather.temperature_celsius %>°C</span>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+          <!-- Morning Activity -->
+          <div style="background: var(--bg-page); padding: 1rem; border-radius: var(--radius-md);">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #1e40af; margin-bottom: 0.4rem;">
+              🌅 Morning: Exploration & Sightseeing
+            </div>
+            <p style="font-size: 0.85rem; color: #475569;">
+              <% if dest.present? && dest.attractions_list.any? %>
+                Visit <strong><%= dest.attractions_list[day_idx % dest.attractions_list.size] %></strong>. Enjoy local breakfast and morning photography.
+              <% else %>
+                Arrival, hotel check-in, orientation walk, and breakfast in city center.
+              <% end %>
+            </p>
+          </div>
+
+          <!-- Afternoon Activity -->
+          <div style="background: var(--bg-page); padding: 1rem; border-radius: var(--radius-md);">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #065f46; margin-bottom: 0.4rem;">
+              ☀️ Afternoon: Culture, Dining & Leisure
+            </div>
+            <p style="font-size: 0.85rem; color: #475569;">
+              <% if dest.present? && dest.attractions_list.size > 1 %>
+                Explore <strong><%= dest.attractions_list[(day_idx + 1) % dest.attractions_list.size] %></strong>. Traditional lunch and neighborhood discovery.
+              <% else %>
+                Local dining experience and cultural tour.
+              <% end %>
+            </p>
+          </div>
+
+          <!-- Evening Activity -->
+          <div style="background: var(--bg-page); padding: 1rem; border-radius: var(--radius-md);">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #7c2d12; margin-bottom: 0.4rem;">
+              🌙 Evening: Dinner & Night Experience
+            </div>
+            <p style="font-size: 0.85rem; color: #475569;">
+              Dinner at recommended local bistro, sunset scenic views, and relaxation at accommodation.
+            </p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

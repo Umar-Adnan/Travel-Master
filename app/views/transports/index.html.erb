@@ -1,0 +1,78 @@
+<% content_for :title, "Transportation & Travel Options - TravelMaster" %>
+
+<div class="container">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🚗 Transportation & Route Options</h1>
+      <p class="section-subtitle">Compare flights, bullet trains, rental cars, and luxury buses by price and duration</p>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <form action="<%= transports_path %>" method="get" class="filter-bar">
+    <div class="filter-group">
+      <input type="text" name="origin_city" value="<%= params[:origin_city] %>" placeholder="Origin City (e.g. Tokyo)..." class="form-control" style="width: 190px;">
+      <input type="text" name="destination_city" value="<%= params[:destination_city] %>" placeholder="Destination City..." class="form-control" style="width: 190px;">
+
+      <select name="transport_type" class="form-control" style="width: 170px;">
+        <option value="">All Types</option>
+        <% @transport_types.each do |t| %>
+          <option value="<%= t %>" <%= "selected" if params[:transport_type] == t %>><%= t %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="submit" class="btn btn-primary">Search Options</button>
+      <%= link_to "Reset", transports_path, class: "btn btn-secondary" %>
+    </div>
+  </form>
+
+  <!-- Transport List -->
+  <% if @transports.any? %>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <% @transports.each do |trans| %>
+        <div class="card" style="padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+              <div style="font-size: 2.2rem; background: var(--bg-page); width: 60px; height: 60px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
+                <%= trans.type_icon %>
+              </div>
+
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <h3 style="font-size: 1.15rem; font-weight: 700;">
+                    <%= trans.origin_city %> ➔ <%= trans.destination_city %>
+                  </h3>
+                  <span class="badge badge-primary"><%= trans.transport_type %></span>
+                  <span class="badge badge-muted"><%= trans.comfort_class %></span>
+                </div>
+
+                <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1rem;">
+                  <span>Carrier: <strong><%= trans.provider_name %></strong></span>
+                  <span>Departure: <strong><%= trans.departure_time %></strong></span>
+                  <span>Duration: <strong><%= trans.duration_formatted %></strong></span>
+                  <span>🌱 Eco-score: <strong><%= trans.eco_rating %>/5</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+              <div style="text-align: right;">
+                <div style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">$<%= trans.fare_price %></div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);"><%= trans.seats_available %> seats left</div>
+              </div>
+
+              <%= link_to "Select & Book →", transport_path(trans), class: "btn btn-primary btn-sm" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card" style="padding: 3rem; text-align: center;">
+      <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem;">No transport routes found matching criteria.</p>
+      <%= link_to "View All Transport Options", transports_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,48 @@
+<% content_for :title, "User Details - #{@user.name}" %>
+
+<div class="card" style="padding: 2rem; max-width: 800px; margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.6rem; font-weight: 800;"><%= @user.name %></h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;"><%= @user.email %></p>
+    </div>
+    <span class="badge badge-<%= @user.admin? ? 'primary' : 'muted' %>" style="font-size: 0.9rem;"><%= @user.role.upcase %></span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; background: var(--bg-page); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 2rem; font-size: 0.9rem;">
+    <div><strong>Travel Preference:</strong><br><%= @user.travel_preference&.capitalize %></div>
+    <div><strong>Default Currency:</strong><br><%= @user.default_currency %></div>
+    <div><strong>Contact Phone:</strong><br><%= @user.phone_number.presence || "None" %></div>
+  </div>
+
+  <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">Planned Trips (<%= @trips.count %>)</h3>
+  <% if @trips.any? %>
+    <table class="data-table" style="margin-bottom: 1.5rem;">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Dates</th>
+          <th>Travelers</th>
+          <th>Total Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @trips.each do |trip| %>
+          <tr>
+            <td><strong><%= trip.title %></strong></td>
+            <td><%= trip.start_date.strftime("%b %d") %> – <%= trip.end_date.strftime("%b %d, %Y") %></td>
+            <td><%= trip.number_of_travelers %></td>
+            <td>$<%= number_with_precision(trip.total_estimated_cost, precision: 2) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">No trips created by this user yet.</p>
+  <% end %>
+
+  <div style="display: flex; gap: 1rem;">
+    <%= link_to "Edit User", edit_admin_user_path(@user), class: "btn btn-primary" %>
+    <%= link_to "← Back to Users", admin_users_path, class: "btn btn-secondary" %>
+  </div>
+</div>

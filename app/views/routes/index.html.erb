@@ -1,0 +1,86 @@
+<% content_for :title, "Road Routes & Traffic Conditions - TravelMaster" %>
+
+<div class="container">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🛣️ Highway Corridors & Road Conditions</h1>
+      <p class="section-subtitle">Real-time highway updates, driving durations, toll fares, and estimated fuel costs</p>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <form action="<%= routes_path %>" method="get" class="filter-bar">
+    <div class="filter-group">
+      <input type="text" name="origin_city" value="<%= params[:origin_city] %>" placeholder="Origin City (e.g. Islamabad, Paris)..." class="form-control" style="width: 210px;">
+      <input type="text" name="destination_city" value="<%= params[:destination_city] %>" placeholder="Destination City (e.g. Hunza, Nice)..." class="form-control" style="width: 210px;">
+
+      <select name="road_condition" class="form-control" style="width: 180px;">
+        <option value="">All Road Conditions</option>
+        <option value="Excellent" <%= "selected" if params[:road_condition] == "Excellent" %>>Excellent (Highway)</option>
+        <option value="Good" <%= "selected" if params[:road_condition] == "Good" %>>Good</option>
+        <option value="Moderate" <%= "selected" if params[:road_condition] == "Moderate" %>>Moderate / Mountain</option>
+      </select>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="submit" class="btn btn-primary">Find Route</button>
+      <%= link_to "Reset", routes_path, class: "btn btn-secondary" %>
+    </div>
+  </form>
+
+  <!-- Route Cards -->
+  <% if @routes.any? %>
+    <div class="grid-2">
+      <% @routes.each do |route| %>
+        <div class="card" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div>
+              <h2 style="font-size: 1.25rem; font-weight: 700;"><%= link_to route.route_name, route_path(route) %></h2>
+              <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.2rem;">
+                📍 <%= route.origin_city %> ➔ <%= route.destination_city %>
+              </div>
+            </div>
+            <span class="badge badge-<%= route.road_condition == 'Excellent' ? 'success' : (route.road_condition == 'Good' ? 'primary' : 'warning') %>">
+              <%= route.road_condition %> Roads
+            </span>
+          </div>
+
+          <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+            <%= route.route_highlights %>
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; background: var(--bg-page); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.8rem; margin-bottom: 1rem;">
+            <div>
+              <span style="color: var(--text-muted);">Distance</span><br>
+              <strong><%= route.distance_km %> km</strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted);">Est. Time</span><br>
+              <strong><%= route.formatted_drive_time %></strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted);">Est. Fuel</span><br>
+              <strong>$<%= route.estimated_fuel_cost %></strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted);">Tolls</span><br>
+              <strong>$<%= route.toll_charges %></strong>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+              Traffic: <strong><%= route.traffic_level %></strong> • Scenic: <strong><%= "★" * route.scenic_score %></strong>
+            </div>
+            <%= link_to "Full Route Advisory →", route_path(route), class: "btn btn-secondary btn-sm" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card" style="padding: 3rem; text-align: center;">
+      <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem;">No routes found matching your search parameters.</p>
+      <%= link_to "View All Routes", routes_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

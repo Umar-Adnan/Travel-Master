@@ -1,0 +1,100 @@
+<% content_for :title, "Explore Destinations - TravelMaster" %>
+
+<div class="container">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">Explore Travel Destinations</h1>
+      <p class="section-subtitle">Discover domestic and international destinations with live weather and estimated costs</p>
+    </div>
+  </div>
+
+  <!-- Filter & Search Bar -->
+  <form action="<%= destinations_path %>" method="get" class="filter-bar">
+    <div class="filter-group">
+      <input type="text" name="q" value="<%= params[:q] %>" placeholder="Search city, country, or keyword..." class="form-control" style="width: 260px;">
+
+      <select name="category" class="form-control" style="width: 170px;">
+        <option value="">All Categories</option>
+        <% @categories.each do |cat| %>
+          <option value="<%= cat %>" <%= "selected" if params[:category] == cat %>><%= cat %></option>
+        <% end %>
+      </select>
+
+      <select name="type" class="form-control" style="width: 160px;">
+        <option value="">All Types</option>
+        <option value="domestic" <%= "selected" if params[:type] == "domestic" %>>Domestic</option>
+        <option value="international" <%= "selected" if params[:type] == "international" %>>International</option>
+      </select>
+
+      <select name="max_budget" class="form-control" style="width: 170px;">
+        <option value="">Max Daily Budget</option>
+        <option value="100" <%= "selected" if params[:max_budget] == "100" %>>Under $100/day</option>
+        <option value="200" <%= "selected" if params[:max_budget] == "200" %>>Under $200/day</option>
+        <option value="350" <%= "selected" if params[:max_budget] == "350" %>>Under $350/day</option>
+      </select>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <%= link_to "Reset", destinations_path, class: "btn btn-secondary" %>
+    </div>
+  </form>
+
+  <!-- Destinations Grid -->
+  <% if @destinations.any? %>
+    <div class="grid-3">
+      <% @destinations.each do |dest| %>
+        <div class="card">
+          <div class="card-img-wrapper">
+            <img src="<%= dest.image_url.presence || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&auto=format&fit=crop&q=80' %>" alt="<%= dest.name %>">
+            <span class="card-badge-top-left"><%= dest.category.presence || 'City' %></span>
+            <span class="card-badge-top-right">⭐ <%= dest.rating %></span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title"><%= link_to dest.name, destination_path(dest) %></h3>
+            <div class="card-meta">
+              <span>📍 <%= dest.city %>, <%= dest.country %></span>
+              <span>•</span>
+              <span><%= dest.is_domestic? ? "Domestic" : "International" %></span>
+            </div>
+            <p class="card-text"><%= dest.description.truncate(110) %></p>
+
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+              <% if dest.current_weather %>
+                <span class="badge badge-primary">
+                  <%= dest.current_weather.condition_icon %> <%= dest.current_weather.temperature_celsius %>°C
+                </span>
+              <% end %>
+
+              <% if dest.current_crowd %>
+                <span class="badge badge-<%= dest.current_crowd.crowd_level == 'High' ? 'warning' : 'success' %>">
+                  👥 <%= dest.current_crowd.crowd_level %>
+                </span>
+              <% end %>
+
+              <% if dest.best_season.present? %>
+                <span class="badge badge-muted">
+                  🗓️ Best: <%= dest.best_season %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Est. Daily Cost</span><br>
+              <strong style="font-size: 1.15rem; color: var(--primary);">$<%= number_with_precision(dest.price, precision: 0) %></strong>
+            </div>
+            <%= link_to "View Details →", destination_path(dest), class: "btn btn-primary btn-sm" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card" style="padding: 3rem; text-align: center;">
+      <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1rem;">No destinations match your search criteria.</p>
+      <%= link_to "Clear Search Filters", destinations_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

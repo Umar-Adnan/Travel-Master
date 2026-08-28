@@ -1,0 +1,225 @@
+<% content_for :title, "#{@destination.name} - Travel Planning & Live Intelligence" %>
+
+<div class="container">
+  <!-- Hero Section -->
+  <div style="position: relative; border-radius: var(--radius-xl); overflow: hidden; height: 380px; margin-bottom: 2rem; background: #0f172a;">
+    <img src="<%= @destination.image_url.presence || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&auto=format&fit=crop&q=80' %>" 
+         alt="<%= @destination.name %>" 
+         style="width: 100%; height: 100%; object-fit: cover; opacity: 0.75;">
+    
+    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.2) 60%); display: flex; flex-direction: column; justify-content: flex-end; padding: 2.5rem;">
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <span class="badge" style="background: white; color: black; font-weight: 700;">⭐ <%= @destination.rating %> Rating</span>
+        <span class="badge badge-primary"><%= @destination.category %></span>
+        <span class="badge badge-success"><%= @destination.is_domestic? ? "Domestic Destination" : "International Travel" %></span>
+      </div>
+      <h1 style="color: white; font-size: 2.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 0.5rem;"><%= @destination.name %></h1>
+      <p style="color: #cbd5e1; font-size: 1.1rem;">📍 <%= @destination.city %>, <%= @destination.country %></p>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="card" style="padding: 1.25rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: white;">
+    <div>
+      <span style="font-size: 0.85rem; color: var(--text-muted);">Estimated Daily Budget</span>
+      <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">
+        $<%= number_with_precision(@destination.price, precision: 0) %> <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-muted);">/ traveler / day</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <%= link_to "💰 Calculate Exact Trip Cost", cost_estimators_path(destination_ids: [@destination.id]), class: "btn btn-accent" %>
+      
+      <% if logged_in? %>
+        <%= link_to "+ Start New Trip to #{@destination.name}", new_trip_path(destination_ids: [@destination.id]), class: "btn btn-primary" %>
+      <% else %>
+        <%= link_to "Sign In to Plan Trip", login_path, class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
+    <!-- Left Column: Details, Weather, Hotels, Transport -->
+    <div>
+      <!-- Overview -->
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.75rem;">About <%= @destination.name %></h2>
+        <p style="color: #334155; line-height: 1.7; font-size: 0.95rem; margin-bottom: 1.25rem;">
+          <%= @destination.description %>
+        </p>
+
+        <% if @destination.attractions_list.any? %>
+          <div style="border-top: 1px solid var(--border-light); padding-top: 1rem;">
+            <strong style="font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">🌟 Popular Attractions & Landmarks:</strong>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+              <% @destination.attractions_list.each do |attr| %>
+                <span class="badge badge-muted">📍 <%= attr %></span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Live Weather Forecast & Guidance -->
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 style="font-size: 1.3rem; font-weight: 700;">🌦️ 7-Day Weather Forecast</h2>
+          <span class="badge badge-primary">Updated Live</span>
+        </div>
+
+        <% if @forecasts.any? %>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+            <% @forecasts.each do |wf| %>
+              <div style="background: var(--bg-page); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; text-align: center;">
+                <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">
+                  <%= wf.forecast_date.strftime("%a, %b %d") %>
+                </div>
+                <div style="font-size: 1.8rem; margin: 0.25rem 0;">
+                  <%= wf.condition_icon %>
+                </div>
+                <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">
+                  <%= wf.temperature_celsius %>°C
+                </div>
+                <div style="font-size: 0.75rem; color: #2563eb;">
+                  💧 <%= wf.rainfall_prob %>%
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.9rem 1.25rem; font-size: 0.9rem; color: #166534;">
+            <strong>💡 Travel & Packing Guidance:</strong> <%= @weather_advice %>
+          </div>
+        <% else %>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Weather forecast data is currently being updated for this destination.</p>
+        <% end %>
+      </div>
+
+      <!-- Hotels & Accommodations -->
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.3rem; font-weight: 700;">🏨 Hotels & Stays in <%= @destination.city %></h2>
+          <%= link_to "View All Hotels", hotels_path(destination_id: @destination.id), class: "btn btn-outline btn-sm" %>
+        </div>
+
+        <% if @hotels.any? %>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <% @hotels.each do |hotel| %>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: white; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <strong style="font-size: 1.05rem;"><%= hotel.name %></strong>
+                    <span style="color: #f59e0b; font-size: 0.85rem;"><%= "★" * hotel.star_rating %></span>
+                    <span class="badge badge-muted"><%= hotel.hotel_type %></span>
+                  </div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+                    <%= hotel.address %> • <%= hotel.amenities_list.take(3).join(", ") %>
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                  <div style="text-align: right;">
+                    <strong style="font-size: 1.2rem; color: var(--primary);">$<%= hotel.price_per_night %></strong>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">/ night</div>
+                  </div>
+
+                  <%= link_to "View Stay", hotel_path(hotel), class: "btn btn-secondary btn-sm" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">No hotels listed directly yet. Base accommodation estimates are applied.</p>
+        <% end %>
+      </div>
+
+      <!-- Transport Connections -->
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.3rem; font-weight: 700;">🚗 Transportation & Flight Options</h2>
+          <%= link_to "Compare Transport", transports_path, class: "btn btn-outline btn-sm" %>
+        </div>
+
+        <% if @transports.any? %>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <% @transports.each do |trans| %>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: white;">
+                <div>
+                  <div style="font-weight: 600; font-size: 0.95rem;">
+                    <%= trans.type_icon %> <%= trans.transport_type %>: <%= trans.origin_city %> → <%= trans.destination_city %>
+                  </div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">
+                    Carrier: <%= trans.provider_name %> • Duration: <%= trans.duration_formatted %> • Class: <%= trans.comfort_class %>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <strong style="font-size: 1.1rem; color: var(--primary);">$<%= trans.fare_price %></strong>
+                  <%= link_to "Select", transport_path(trans), class: "btn btn-secondary btn-sm" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Transport links available from standard transit hubs.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Crowd Analysis, Best Seasons, Routes -->
+    <div>
+      <!-- Tourist Crowd Analysis -->
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">👥 Tourist Crowd Analysis</h3>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.9rem; font-weight: 600;">Crowd Intensity</span>
+          <span class="badge badge-<%= @crowd_analysis[:level] == 'High' ? 'warning' : 'success' %>">
+            <%= @crowd_analysis[:level] %> (<%= @crowd_analysis[:percentage] %>%)
+          </span>
+        </div>
+
+        <div class="crowd-meter">
+          <div class="crowd-fill-<%= @crowd_analysis[:level].to_s.downcase %>"></div>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin: 0.75rem 0;">
+          <strong>Hotel Occupancy:</strong> ~<%= @crowd_analysis[:occupancy] %>%<br>
+          <strong>Season:</strong> <%= @crowd_analysis[:season_type] %>
+        </div>
+
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.85rem; color: #92400e;">
+          <strong>💡 Timing Advice:</strong> <%= @crowd_analysis[:best_time_advice] %>
+        </div>
+      </div>
+
+      <!-- Quick Trip Details -->
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">🗓️ Trip Planning Info</h3>
+        <div style="font-size: 0.9rem; line-height: 1.8;">
+          <div><strong>Recommended Duration:</strong> <%= @destination.duration || 5 %> days</div>
+          <div><strong>Best Season to Visit:</strong> <%= @destination.best_season.presence || "Year-round" %></div>
+          <div><strong>Base Daily Rate:</strong> $<%= @destination.price %> / day</div>
+          <div><strong>Coordinates:</strong> <%= @destination.latitude %>, <%= @destination.longitude %></div>
+        </div>
+      </div>
+
+      <!-- Driving Routes -->
+      <% if @routes.any? %>
+        <div class="card" style="padding: 1.5rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">🛣️ Nearby Driving Routes</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <% @routes.each do |rt| %>
+              <div style="padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.85rem;">
+                <strong><%= rt.origin_city %> → <%= rt.destination_city %></strong>
+                <div style="color: var(--text-muted); margin: 0.25rem 0;">
+                  <%= rt.distance_km %> km • <%= rt.formatted_drive_time %> • Road: <%= rt.road_condition %>
+                </div>
+                <%= link_to "View Route", route_path(rt), style: "font-weight: 600; font-size: 0.8rem;" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

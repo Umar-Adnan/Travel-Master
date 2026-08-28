@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Trip Itinerary - TravelMaster" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= stylesheet_link_tag :application, "data-turbo-track": "reload" %>
+    <style>
+      body { background: white; color: black; font-size: 12pt; padding: 20px; }
+      .no-print { display: none !important; }
+      @media print {
+        .btn-print-action { display: none; }
+      }
+    </style>
+  </head>
+  <body onload="window.print()">
+    <div style="margin-bottom: 20px;" class="btn-print-action">
+      <button onclick="window.print()" class="btn btn-primary btn-sm">🖨️ Print Now</button>
+      <a href="javascript:history.back()" class="btn btn-secondary btn-sm">← Back</a>
+    </div>
+    <%= yield %>
+  </body>
+</html>

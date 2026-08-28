@@ -1,0 +1,114 @@
+<% content_for :title, "My Profile - TravelMaster" %>
+
+<div class="container" style="margin-top: 1rem;">
+  <div style="display: grid; grid-template-columns: 320px 1fr; gap: 2rem; align-items: start;">
+    <!-- Profile Card -->
+    <div class="card" style="padding: 1.75rem; text-align: center;">
+      <div style="width: 84px; height: 84px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; margin: 0 auto 1rem;">
+        <%= @user.name.first %>
+      </div>
+      <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.2rem;"><%= @user.name %></h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;"><%= @user.email %></p>
+
+      <div style="margin-bottom: 1.5rem;">
+        <span class="badge badge-primary"><%= @user.role.upcase %></span>
+        <span class="badge badge-success"><%= @user.travel_preference.capitalize %> Traveler</span>
+      </div>
+
+      <div style="text-align: left; background: var(--bg-page); padding: 1rem; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        <div style="margin-bottom: 0.5rem;"><strong>Currency:</strong> <%= @user.default_currency %></div>
+        <div style="margin-bottom: 0.5rem;"><strong>Phone:</strong> <%= @user.phone_number.presence || "Not specified" %></div>
+        <div><strong>Bio:</strong> <%= @user.bio.presence || "Passionate world explorer." %></div>
+      </div>
+
+      <%= link_to "✏️ Edit Profile Preferences", edit_profile_path, class: "btn btn-outline btn-sm", style: "width: 100%;" %>
+    </div>
+
+    <!-- Trips & Alerts Dashboard -->
+    <div>
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">My Planned Trips</h2>
+          <p class="section-subtitle">Manage your itineraries, travel dates, and cost breakdowns</p>
+        </div>
+        <%= link_to "+ Plan New Trip", new_trip_path, class: "btn btn-primary" %>
+      </div>
+
+      <% if @trips.any? %>
+        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem;">
+          <% @trips.each do |trip| %>
+            <div class="card" style="padding: 1.25rem;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+                    <h3 style="font-size: 1.2rem; font-weight: 700;"><%= link_to trip.title, trip_path(trip) %></h3>
+                    <span class="badge badge-muted"><%= trip.trip_type %></span>
+                    <span class="badge badge-primary"><%= trip.status %></span>
+                  </div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <span>📅 <%= trip.start_date.strftime("%b %d, %Y") %> – <%= trip.end_date.strftime("%b %d, %Y") %> (<%= trip.duration_days %> days)</span>
+                    <span>👥 <%= trip.number_of_travelers %> <%= "traveler".pluralize(trip.number_of_travelers) %></span>
+                    <span>📍 <%= trip.destinations.map(&:name).join(", ").presence || "No destinations selected" %></span>
+                  </div>
+                </div>
+
+                <div style="text-align: right;">
+                  <div style="font-size: 1.3rem; font-weight: 800; color: var(--primary);">
+                    $<%= number_with_precision(trip.total_estimated_cost, precision: 2) %>
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">
+                    <%= trip.budget_status %>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 0.5rem;">
+                  <%= link_to "View Itinerary", itinerary_trip_path(trip), class: "btn btn-secondary btn-sm" %>
+                  <%= link_to "Cost Breakdown", cost_breakdown_trip_path(trip), class: "btn btn-secondary btn-sm" %>
+                  <%= link_to "🖨️ Print", print_view_trip_path(trip), class: "btn btn-outline btn-sm", target: "_blank" %>
+                </div>
+                <%= link_to "Manage Trip →", trip_path(trip), class: "btn btn-primary btn-sm" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="card" style="padding: 2.5rem; text-align: center; margin-bottom: 2.5rem;">
+          <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1rem;">You haven't created any trips yet.</p>
+          <div style="display: flex; justify-content: center; gap: 1rem;">
+            <%= link_to "Plan a Trip Wizard", new_trip_path, class: "btn btn-primary" %>
+            <%= link_to "Estimate Costs First", cost_estimators_path, class: "btn btn-secondary" %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Recent Advisories -->
+      <div class="section-header" style="margin-top: 2rem;">
+        <div>
+          <h2 class="section-title">Recent Travel Advisories & Alerts</h2>
+          <p class="section-subtitle">Live weather, crowd, and route warnings for your destinations</p>
+        </div>
+        <%= link_to "View All Alerts", alerts_path, class: "btn btn-outline btn-sm" %>
+      </div>
+
+      <% if @recent_alerts.any? %>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <% @recent_alerts.each do |alert| %>
+            <div class="card" style="padding: 1rem; border-left: 4px solid <%= alert.severity == 'warning' ? '#f59e0b' : '#3b82f6' %>;">
+              <div style="display: flex; justify-content: space-between;">
+                <strong><%= alert.type_icon %> <%= alert.title %></strong>
+                <span class="badge badge-<%= alert.severity == 'warning' ? 'warning' : 'primary' %>"><%= alert.severity.upcase %></span>
+              </div>
+              <p style="font-size: 0.85rem; color: #475569; margin-top: 0.3rem;"><%= alert.message %></p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="card" style="padding: 1.5rem; text-align: center; color: var(--text-muted);">
+          No active alerts at this moment. Have a safe journey!
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

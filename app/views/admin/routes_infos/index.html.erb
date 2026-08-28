@@ -1,0 +1,45 @@
+<% content_for :title, "Manage Routes - Admin" %>
+
+<div>
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🛣️ Highway & Road Segments</h1>
+      <p class="section-subtitle">Manage highway condition reports, distance charts, and toll costs</p>
+    </div>
+    <%= link_to "+ Add New Route", new_admin_routes_info_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Route Name</th>
+          <th>Corridor</th>
+          <th>Distance</th>
+          <th>Time</th>
+          <th>Condition</th>
+          <th>Tolls</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @routes.each do |route| %>
+          <tr>
+            <td><strong><%= route.route_name %></strong></td>
+            <td><%= route.origin_city %> ➔ <%= route.destination_city %></td>
+            <td><%= route.distance_km %> km</td>
+            <td><%= route.formatted_drive_time %></td>
+            <td><span class="badge badge-<%= route.road_condition == 'Excellent' ? 'success' : 'primary' %>"><%= route.road_condition %></span></td>
+            <td>$<%= route.toll_charges %></td>
+            <td style="text-align: right;">
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <%= link_to "Edit", edit_admin_routes_info_path(route), class: "btn btn-outline btn-sm" %>
+                <%= button_to "Delete", admin_routes_info_path(route), method: :delete, data: { turbo_confirm: "Delete route?" }, class: "btn btn-danger btn-sm" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

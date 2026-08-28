@@ -12,5 +12,6 @@ class CreateDestination < ActiveRecord::Migration[8.1]
       t.datetime :booking_open_at
       t.timestamps
     end
+    
   end
 end

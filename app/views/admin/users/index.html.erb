@@ -1,0 +1,47 @@
+<% content_for :title, "Manage Users - Admin" %>
+
+<div>
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">👤 User Accounts & Roles</h1>
+      <p class="section-subtitle">Manage user permissions, travel styles, and account access</p>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Travel Style</th>
+          <th>Currency</th>
+          <th>Trips</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td><strong><%= user.name %></strong></td>
+            <td><%= user.email %></td>
+            <td><span class="badge badge-<%= user.admin? ? 'primary' : 'muted' %>"><%= user.role.upcase %></span></td>
+            <td><%= user.travel_preference&.capitalize %></td>
+            <td><%= user.default_currency %></td>
+            <td><%= user.trips.count %></td>
+            <td style="text-align: right;">
+              <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <%= link_to "View", admin_user_path(user), class: "btn btn-outline btn-sm" %>
+                <%= link_to "Edit", edit_admin_user_path(user), class: "btn btn-outline btn-sm" %>
+                <% unless user == current_user %>
+                  <%= button_to "Delete", admin_user_path(user), method: :delete, data: { turbo_confirm: "Delete user?" }, class: "btn btn-danger btn-sm" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

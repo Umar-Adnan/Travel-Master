@@ -1,0 +1,82 @@
+<%= form_with model: [:admin, @destination], local: true do |f| %>
+  <% if @destination.errors.any? %>
+    <div class="flash flash-alert" style="margin-bottom: 1.5rem;">
+      <ul>
+        <% @destination.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+    <div class="form-group">
+      <%= f.label :name, "Destination Name", class: "form-label" %>
+      <%= f.text_field :name, class: "form-control", placeholder: "e.g. Tokyo", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :city, "City", class: "form-label" %>
+      <%= f.text_field :city, class: "form-control", placeholder: "Tokyo", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :country, "Country", class: "form-label" %>
+      <%= f.text_field :country, class: "form-control", placeholder: "Japan", required: true %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
+    <div class="form-group">
+      <%= f.label :category, "Category", class: "form-label" %>
+      <%= f.select :category, ["Urban & Modern", "Cultural & Historic", "Tropical Beach", "Mountain & Nature", "Adventure & Trekking", "Luxury & Desert"], {}, class: "form-control" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :price, "Base Cost / Day ($)", class: "form-label" %>
+      <%= f.number_field :price, step: "0.01", class: "form-control", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :rating, "Star Rating", class: "form-label" %>
+      <%= f.number_field :rating, step: "0.1", min: 1.0, max: 5.0, class: "form-control" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :best_season, "Best Season", class: "form-label" %>
+      <%= f.text_field :best_season, class: "form-control", placeholder: "e.g. Spring / Autumn" %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :image_url, "Image URL", class: "form-label" %>
+    <%= f.text_field :image_url, class: "form-control", placeholder: "https://images.unsplash.com/..." %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :description, "Full Destination Description", class: "form-label" %>
+    <%= f.text_area :description, rows: 4, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :popular_attractions, "Popular Attractions (comma separated)", class: "form-label" %>
+    <%= f.text_field :popular_attractions, class: "form-control", placeholder: "e.g. Shibuya Crossing, Senso-ji Temple, Tokyo Tower" %>
+  </div>
+
+  <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem;">
+    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; cursor: pointer;">
+      <%= f.check_box :available %>
+      <span>Available for Planning</span>
+    </label>
+
+    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; cursor: pointer;">
+      <%= f.check_box :is_domestic %>
+      <span>Domestic Travel Tag</span>
+    </label>
+  </div>
+
+  <div style="display: flex; gap: 1rem;">
+    <%= f.submit "Save Destination", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_destinations_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

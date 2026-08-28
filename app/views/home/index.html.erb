@@ -1,0 +1,253 @@
+<% content_for :title, "TravelMaster - Unified Travel Planning, Weather, Routes & Cost Estimation" %>
+
+<div class="container">
+  <!-- Hero Section -->
+  <section class="hero-banner">
+    <div style="position: relative; z-index: 10;">
+      <span class="badge" style="background: rgba(37, 99, 235, 0.3); color: #93c5fd; border-color: rgba(147, 197, 253, 0.3); margin-bottom: 1rem;">
+        🚀 Complete All-in-One Travel Intelligence Platform
+      </span>
+      <h1 class="hero-title">Plan Less. Explore More. Know Every Expense & Route.</h1>
+      <p class="hero-subtitle">
+        Eliminate app-switching. TravelMaster integrates destinations, route planning, hotel and transport comparison, live weather forecasts, tourist crowd analysis, and precise cost estimates into one unified hub.
+      </p>
+
+      <!-- Instant Search & Plan Form -->
+      <form action="<%= destinations_path %>" method="get" class="hero-search-box">
+        <input type="text" name="q" placeholder="Where do you want to go? (e.g. Tokyo, Paris, Bali)" aria-label="Destination query">
+        <select name="category" aria-label="Category filter">
+          <option value="">All Categories</option>
+          <% @categories.each do |cat| %>
+            <option value="<%= cat %>"><%= cat %></option>
+          <% end %>
+        </select>
+        <select name="type" aria-label="Domestic or International">
+          <option value="">All Destinations</option>
+          <option value="domestic">Domestic Trips</option>
+          <option value="international">International Trips</option>
+        </select>
+        <button type="submit" class="btn btn-primary">
+          🔍 Discover Destinations
+        </button>
+      </form>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.9rem; color: #cbd5e1;">
+        <span>🔥 Trending:</span>
+        <a href="<%= destinations_path(q: 'Tokyo') %>" style="color: #93c5fd;">Tokyo</a>
+        <a href="<%= destinations_path(q: 'Paris') %>" style="color: #93c5fd;">Paris</a>
+        <a href="<%= destinations_path(q: 'Bali') %>" style="color: #93c5fd;">Bali</a>
+        <a href="<%= destinations_path(q: 'Swiss Alps') %>" style="color: #93c5fd;">Swiss Alps</a>
+        <a href="<%= destinations_path(q: 'Hunza') %>" style="color: #93c5fd;">Hunza Valley</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Alerts Ribbon -->
+  <% if @latest_alerts.any? %>
+    <div style="background: white; border: 1px solid var(--border-color); border-left: 4px solid var(--warning); border-radius: var(--radius-md); padding: 0.9rem 1.25rem; margin-bottom: 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.2rem;">📢</span>
+        <div>
+          <strong>Live Travel Advisory:</strong> <%= @latest_alerts.first.title %> — <%= @latest_alerts.first.message.truncate(95) %>
+        </div>
+      </div>
+      <%= link_to "View All Alerts →", alerts_path, class: "btn btn-outline btn-sm" %>
+    </div>
+  <% end %>
+
+  <!-- Feature Pillars -->
+  <section style="margin-bottom: 4rem;">
+    <div class="section-header" style="text-align: center; display: block; margin-bottom: 2.5rem;">
+      <h2 class="section-title">Everything You Need for Perfect Journeys</h2>
+      <p class="section-subtitle">A synchronized ecosystem designed for travelers, planners, and corporate groups.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card" style="padding: 1.75rem;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">💰</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Transparent Cost Estimation</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+          Real-time expense calculations encompassing lodging, transport fares, toll charges, fuel, meals, and excursions with instant budget variance tracking.
+        </p>
+        <div style="margin-top: 1.25rem;">
+          <%= link_to "Try Cost Estimator →", cost_estimators_path, style: "font-weight: 600; font-size: 0.9rem;" %>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 1.75rem;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">🌦️</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Weather Forecasting & Advice</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+          Multi-day destination forecasts and intelligent travel guidance tailored to precipitation risks, temperature fluctuations, and severe advisories.
+        </p>
+        <div style="margin-top: 1.25rem;">
+          <%= link_to "Check Weather Forecasts →", weather_index_path, style: "font-weight: 600; font-size: 0.9rem;" %>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 1.75rem;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">👥</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Tourist Crowd Analysis</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+          Seasonal crowd intensity indexes and occupancy trends help you avoid high-surge periods or capitalize on budget-friendly off-peak windows.
+        </p>
+        <div style="margin-top: 1.25rem;">
+          <%= link_to "Explore Crowd Heatmap →", crowds_path, style: "font-weight: 600; font-size: 0.9rem;" %>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 1.75rem;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">🛣️</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Route Planning & Road Status</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+          Detailed road conditions, toll breakdown, scenic driving ratings, and distance calculators between your starting location and destinations.
+        </p>
+        <div style="margin-top: 1.25rem;">
+          <%= link_to "View Route Network →", routes_path, style: "font-weight: 600; font-size: 0.9rem;" %>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 1.75rem;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">🏨</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Hotels & Accommodations</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+          Filter by budget tiers, star ratings, and amenities, with direct 1-click addition to your customized trip itinerary.
+        </p>
+        <div style="margin-top: 1.25rem;">
+          <%= link_to "Find Accommodations →", hotels_path, style: "font-weight: 600; font-size: 0.9rem;" %>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 1.75rem;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">🚗</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">Multi-Modal Transportation</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">
+          Compare flights, high-speed trains, rental cars, and luxury buses by travel time, pricing, comfort class, and eco-ratings.
+        </p>
+        <div style="margin-top: 1.25rem;">
+          <%= link_to "Compare Transport →", transports_path, style: "font-weight: 600; font-size: 0.9rem;" %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Destinations -->
+  <section style="margin-bottom: 4rem;">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Featured Destinations</h2>
+        <p class="section-subtitle">Hand-picked destinations with live conditions and estimated daily costs</p>
+      </div>
+      <%= link_to "View All Destinations →", destinations_path, class: "btn btn-outline" %>
+    </div>
+
+    <div class="grid-3">
+      <% @featured_destinations.each do |dest| %>
+        <div class="card">
+          <div class="card-img-wrapper">
+            <img src="<%= dest.image_url.presence || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&auto=format&fit=crop&q=80' %>" alt="<%= dest.name %>">
+            <span class="card-badge-top-left"><%= dest.category.presence || 'Explore' %></span>
+            <span class="card-badge-top-right">⭐ <%= dest.rating %></span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title"><%= link_to dest.name, destination_path(dest) %></h3>
+            <div class="card-meta">
+              <span>📍 <%= dest.city %>, <%= dest.country %></span>
+              <span>•</span>
+              <span><%= dest.is_domestic? ? "Domestic" : "International" %></span>
+            </div>
+            <p class="card-text"><%= dest.description.truncate(110) %></p>
+
+            <!-- Live Condition Bar -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+              <% if dest.current_weather %>
+                <span class="badge badge-primary">
+                  <%= dest.current_weather.condition_icon %> <%= dest.current_weather.temperature_celsius %>°C (<%= dest.current_weather.condition %>)
+                </span>
+              <% end %>
+
+              <% if dest.current_crowd %>
+                <span class="badge badge-<%= dest.current_crowd.crowd_level == 'High' ? 'warning' : 'success' %>">
+                  👥 <%= dest.current_crowd.crowd_level %> Crowds
+                </span>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Est. Base Cost</span><br>
+              <strong style="font-size: 1.15rem; color: var(--primary);">$<%= number_with_precision(dest.price, precision: 0) %></strong>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">/ day</span>
+            </div>
+            <%= link_to "Explore Destination", destination_path(dest), class: "btn btn-primary btn-sm" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Interactive Quick Cost Estimator Preview Section -->
+  <section style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 3rem; border-radius: var(--radius-xl); margin-bottom: 4rem;">
+    <div style="max-width: 780px; margin: 0 auto; text-align: center;">
+      <span class="badge" style="background: rgba(13, 148, 136, 0.3); color: #5eead4; border-color: rgba(94, 234, 212, 0.3); margin-bottom: 1rem;">
+        ⚡ Instant Trip Calculator
+      </span>
+      <h2 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 1rem;">Estimate Your Entire Trip in 30 Seconds</h2>
+      <p style="color: #cbd5e1; font-size: 1.05rem; margin-bottom: 2rem;">
+        Calculate accurate lodging, transport fares, dining allowances, tolls, and excursion budgets across all destination combinations.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <%= link_to "Launch Interactive Cost Estimator", cost_estimators_path, class: "btn btn-accent btn-lg" %>
+        <% if logged_in? %>
+          <%= link_to "+ Create a Full Itinerary", new_trip_path, class: "btn btn-outline btn-lg", style: "color: white; border-color: #475569;" %>
+        <% else %>
+          <%= link_to "Create Free Account", signup_path, class: "btn btn-outline btn-lg", style: "color: white; border-color: #475569;" %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Road & Transit Routes -->
+  <section style="margin-bottom: 4rem;">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Popular Transit & Highway Corridors</h2>
+        <p class="section-subtitle">Road conditions, fuel estimates, and travel times across top routes</p>
+      </div>
+      <%= link_to "Explore All Routes →", routes_path, class: "btn btn-outline" %>
+    </div>
+
+    <div class="grid-2">
+      <% @popular_routes.each do |route| %>
+        <div class="card" style="padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.1rem; font-weight: 700;"><%= route.route_name %></h3>
+              <span style="font-size: 0.85rem; color: var(--text-muted);">
+                <%= route.origin_city %> ➔ <%= route.destination_city %>
+              </span>
+            </div>
+            <span class="badge badge-<%= route.road_condition == 'Excellent' ? 'success' : 'primary' %>">
+              <%= route.road_condition %> Roads
+            </span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; background: var(--bg-page); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 0.75rem;">
+            <div><strong>📏 Distance:</strong> <%= route.distance_km %> km</div>
+            <div><strong>⏱️ Duration:</strong> <%= route.formatted_drive_time %></div>
+            <div><strong>⛽ Est. Fuel:</strong> $<%= route.estimated_fuel_cost %></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.85rem; color: var(--text-muted);">
+              Tolls: <strong>$<%= route.toll_charges %></strong> | Traffic: <strong><%= route.traffic_level %></strong>
+            </span>
+            <%= link_to "Route Details →", route_path(route), class: "btn btn-secondary btn-sm" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+</div>

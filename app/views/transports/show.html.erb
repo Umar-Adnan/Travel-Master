@@ -1,0 +1,60 @@
+<% content_for :title, "#{@transport.transport_type} Route - #{@transport.origin_city} to #{@transport.destination_city}" %>
+
+<div class="container-sm">
+  <div class="card" style="padding: 2.25rem;">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+      <div style="font-size: 2.5rem;"><%= @transport.type_icon %></div>
+      <div>
+        <h1 style="font-size: 1.6rem; font-weight: 800;"><%= @transport.transport_type %>: <%= @transport.origin_city %> ➔ <%= @transport.destination_city %></h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Operated by <strong><%= @transport.provider_name %></strong></p>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; background: var(--bg-page); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 2rem;">
+      <div>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Departure / Arrival</span>
+        <div style="font-weight: 700; font-size: 1rem;"><%= @transport.departure_time %> – <%= @transport.arrival_time %></div>
+      </div>
+      <div>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Duration</span>
+        <div style="font-weight: 700; font-size: 1rem;"><%= @transport.duration_formatted %></div>
+      </div>
+      <div>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Class & Comfort</span>
+        <div style="font-weight: 700; font-size: 1rem;"><%= @transport.comfort_class %> (<%= @transport.eco_rating %> Eco)</div>
+      </div>
+    </div>
+
+    <div style="border-top: 1px solid var(--border-light); padding-top: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 1.1rem; font-weight: 700;">Base Fare per Passenger</span>
+        <span style="font-size: 1.8rem; font-weight: 800; color: var(--primary);">$<%= @transport.fare_price %></span>
+      </div>
+    </div>
+
+    <% if logged_in? && @user_trips.any? %>
+      <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Book / Add to Trip Itinerary</h3>
+      <%= form_with url: add_to_trip_transport_path(@transport), method: :post, local: true do |f| %>
+        <div class="form-group">
+          <%= f.label :trip_id, "Select Target Trip", class: "form-label" %>
+          <%= f.select :trip_id, @user_trips.map { |t| [t.title, t.id] }, {}, class: "form-control" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :travelers, "Number of Passengers", class: "form-label" %>
+          <%= f.number_field :travelers, value: 1, min: 1, max: 20, class: "form-control" %>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <%= f.submit "🚗 Add Transport to Itinerary", class: "btn btn-primary btn-lg", style: "width: 100%;" %>
+        </div>
+      <% end %>
+    <% elsif logged_in? %>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Create a trip first to add this transport route.</p>
+      <%= link_to "Plan a Trip", new_trip_path, class: "btn btn-primary" %>
+    <% else %>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Log in to add this reservation to your trip.</p>
+      <%= link_to "Log In", login_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>

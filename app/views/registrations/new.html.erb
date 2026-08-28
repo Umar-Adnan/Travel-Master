@@ -1,0 +1,69 @@
+<% content_for :title, "Sign Up - TravelMaster" %>
+
+<div class="container-sm" style="margin-top: 2rem;">
+  <div class="card" style="padding: 2rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">Join TravelMaster</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Create your profile and start building intelligent travel plans</p>
+    </div>
+
+    <%= form_with model: @user, url: signup_path, local: true do |f| %>
+      <% if @user.errors.any? %>
+        <div class="flash flash-alert" style="margin-bottom: 1.5rem;">
+          <ul style="margin-left: 1rem;">
+            <% @user.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <%= f.label :name, "Full Name", class: "form-label" %>
+        <%= f.text_field :name, class: "form-control", placeholder: "Alex Morgan", required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :email, "Email Address", class: "form-label" %>
+        <%= f.email_field :email, class: "form-control", placeholder: "alex@example.com", required: true %>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <%= f.label :password, "Password (min 6 chars)", class: "form-label" %>
+          <%= f.password_field :password, class: "form-control", placeholder: "••••••••", required: true %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :password_confirmation, "Confirm Password", class: "form-label" %>
+          <%= f.password_field :password_confirmation, class: "form-control", placeholder: "••••••••", required: true %>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <%= f.label :travel_preference, "Primary Travel Style", class: "form-label" %>
+          <%= f.select :travel_preference, [["Budget Conscious", "budget"], ["Balanced / Moderate", "moderate"], ["Luxury & Comfort", "luxury"]], {}, class: "form-control" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :default_currency, "Preferred Currency", class: "form-label" %>
+          <%= f.select :default_currency, ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "PKR"], {}, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :phone_number, "Phone Number (optional)", class: "form-label" %>
+        <%= f.text_field :phone_number, class: "form-control", placeholder: "+1 (555) 019-2834" %>
+      </div>
+
+      <div style="margin-top: 2rem;">
+        <%= f.submit "Create Free Account", class: "btn btn-primary btn-lg", style: "width: 100%;" %>
+      </div>
+    <% end %>
+
+    <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
+      Already registered? <%= link_to "Log In here", login_path, style: "font-weight: 600;" %>
+    </div>
+  </div>
+</div>

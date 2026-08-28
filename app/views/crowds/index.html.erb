@@ -1,0 +1,59 @@
+<% content_for :title, "Tourist Crowd Analysis & Seasonality - TravelMaster" %>
+
+<div class="container">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">👥 Tourist Crowd Intensity & Seasonality Index</h1>
+      <p class="section-subtitle">Real-time arrival trends, hotel occupancy levels, and peak season avoidance recommendations</p>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <% @destinations.each do |dest| %>
+      <% crowd = dest.current_crowd %>
+      <div class="card">
+        <div class="card-body">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <div>
+              <h2 style="font-size: 1.2rem; font-weight: 700;"><%= link_to dest.name, destination_path(dest) %></h2>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">📍 <%= dest.city %>, <%= dest.country %></div>
+            </div>
+
+            <% if crowd %>
+              <span class="badge badge-<%= crowd.crowd_level == 'High' ? 'warning' : 'success' %>">
+                <%= crowd.crowd_icon %>
+              </span>
+            <% end %>
+          </div>
+
+          <% if crowd %>
+            <div style="margin: 1rem 0;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.3rem;">
+                <span>Crowd Density</span>
+                <strong><%= crowd.intensity_percentage %>%</strong>
+              </div>
+              <div class="crowd-meter">
+                <div class="crowd-fill-<%= crowd.crowd_level.to_s.downcase %>" style="width: <%= crowd.intensity_percentage %>%;"></div>
+              </div>
+            </div>
+
+            <div style="background: var(--bg-page); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.8rem; margin-bottom: 1rem;">
+              <div>🗓️ <strong>Season:</strong> <%= crowd.season_type %> (<%= crowd.month_or_season %>)</div>
+              <div>🏨 <strong>Est. Hotel Occupancy:</strong> <%= crowd.average_hotel_occupancy %>%</div>
+            </div>
+
+            <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+              <%= crowd.recommendations %>
+            </p>
+          <% else %>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 1.5rem 0;">Seasonal crowd telemetry loading...</p>
+          <% end %>
+        </div>
+
+        <div class="card-footer">
+          <%= link_to "View Seasonal Trends →", crowd_path(dest), class: "btn btn-primary btn-sm", style: "width: 100%;" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

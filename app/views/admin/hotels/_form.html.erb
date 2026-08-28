@@ -1,0 +1,70 @@
+<%= form_with model: [:admin, @hotel], local: true do |f| %>
+  <% if @hotel.errors.any? %>
+    <div class="flash flash-alert" style="margin-bottom: 1.5rem;">
+      <ul>
+        <% @hotel.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+    <div class="form-group">
+      <%= f.label :name, "Hotel Name", class: "form-label" %>
+      <%= f.text_field :name, class: "form-control", placeholder: "e.g. Park Hyatt Tokyo", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :destination_id, "Destination", class: "form-label" %>
+      <%= f.collection_select :destination_id, @destinations, :id, :name, {}, class: "form-control", required: true %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
+    <div class="form-group">
+      <%= f.label :hotel_type, "Type", class: "form-label" %>
+      <%= f.select :hotel_type, ["Luxury Resort", "Hotel", "Boutique Hotel", "Budget Inn", "Serviced Apartment"], {}, class: "form-control" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :price_per_night, "Price per Night ($)", class: "form-label" %>
+      <%= f.number_field :price_per_night, step: "0.01", class: "form-control", required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :star_rating, "Stars (1-5)", class: "form-label" %>
+      <%= f.number_field :star_rating, min: 1, max: 5, class: "form-control" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :available_rooms, "Available Rooms", class: "form-label" %>
+      <%= f.number_field :available_rooms, min: 0, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :address, "Street Address", class: "form-label" %>
+    <%= f.text_field :address, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :amenities, "Amenities (comma separated)", class: "form-label" %>
+    <%= f.text_field :amenities, class: "form-control", placeholder: "e.g. Free WiFi, Infinity Pool, Spa, Breakfast Included, Ocean View" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :image_url, "Image URL", class: "form-label" %>
+    <%= f.text_field :image_url, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :description, "Description", class: "form-label" %>
+    <%= f.text_area :description, rows: 3, class: "form-control" %>
+  </div>
+
+  <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+    <%= f.submit "Save Hotel", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_hotels_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

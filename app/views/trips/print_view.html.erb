@@ -1,0 +1,57 @@
+<div style="max-width: 800px; margin: 0 auto;">
+  <div style="border-bottom: 2px solid #0f172a; padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+      <h1 style="font-size: 24pt; font-weight: bold; margin-bottom: 4px;">🌍 TravelMaster Itinerary</h1>
+      <h2 style="font-size: 16pt; color: #334155;"><%= @trip.title %></h2>
+    </div>
+    <div style="text-align: right; font-size: 10pt; color: #64748b;">
+      Generated on <%= Date.current.strftime("%B %d, %Y") %><br>
+      Status: <strong><%= @trip.status.upcase %></strong>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; font-size: 10pt;">
+    <div><strong>Dates:</strong><br><%= @trip.start_date.strftime("%b %d") %> – <%= @trip.end_date.strftime("%b %d, %Y") %></div>
+    <div><strong>Duration:</strong><br><%= @trip.duration_days %> Days</div>
+    <div><strong>Travelers:</strong><br><%= @trip.number_of_travelers %> <%= "Person".pluralize(@trip.number_of_travelers) %></div>
+    <div><strong>Total Est. Cost:</strong><br><strong style="font-size: 12pt; color: #2563eb;">$<%= number_with_precision(@trip.total_estimated_cost, precision: 2) %></strong></div>
+  </div>
+
+  <h3 style="font-size: 13pt; margin-bottom: 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">Destinations</h3>
+  <div style="margin-bottom: 20px; font-size: 10pt;">
+    <% @destinations.each_with_index do |dest, i| %>
+      <div style="margin-bottom: 6px;">
+        <strong>Stop <%= i + 1 %>: <%= dest.name %></strong> (<%= dest.city %>, <%= dest.country %>) — Best Season: <%= dest.best_season.presence || "Year-round" %>
+      </div>
+    <% end %>
+  </div>
+
+  <h3 style="font-size: 13pt; margin-bottom: 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">Itemized Budget & Reservations</h3>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 10pt;">
+    <thead>
+      <tr style="background: #f1f5f9; text-align: left;">
+        <th style="padding: 6px; border: 1px solid #cbd5e1;">Category</th>
+        <th style="padding: 6px; border: 1px solid #cbd5e1;">Description</th>
+        <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: right;">Unit Cost</th>
+        <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: center;">Qty</th>
+        <th style="padding: 6px; border: 1px solid #cbd5e1; text-align: right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @bookings.each do |b| %>
+        <tr>
+          <td style="padding: 6px; border: 1px solid #cbd5e1;"><%= b.item_type.capitalize %></td>
+          <td style="padding: 6px; border: 1px solid #cbd5e1;"><%= b.title %></td>
+          <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right;">$<%= number_with_precision(b.unit_cost, precision: 2) %></td>
+          <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: center;"><%= b.quantity %></td>
+          <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; font-weight: bold;">$<%= number_with_precision(b.total_cost, precision: 2) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <% if @trip.notes.present? %>
+    <h3 style="font-size: 13pt; margin-bottom: 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">Notes & Guidelines</h3>
+    <p style="font-size: 10pt; line-height: 1.5; color: #334155;"><%= @trip.notes %></p>
+  <% end %>
+</div>

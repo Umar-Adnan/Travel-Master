@@ -1,0 +1,54 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="brand-logo" style="color: white; margin-bottom: 1rem;">
+          <span>🌍 TravelMaster</span>
+        </div>
+        <p style="font-size: 0.9rem; line-height: 1.6; max-width: 320px;">
+          The all-in-one travel planning platform unifying destinations, route navigation, real-time weather forecasting, live tourist crowd analysis, and transparent cost estimates.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><%= link_to "Top Destinations", destinations_path %></li>
+          <li><%= link_to "Cost Estimator Tool", cost_estimators_path %></li>
+          <li><%= link_to "Find Hotels", hotels_path %></li>
+          <li><%= link_to "Transport Options", transports_path %></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Intelligence</h4>
+        <ul>
+          <li><%= link_to "Road Routes & Traffic", routes_path %></li>
+          <li><%= link_to "Destination Weather", weather_index_path %></li>
+          <li><%= link_to "Tourist Crowd Index", crowds_path %></li>
+          <li><%= link_to "Safety & Weather Alerts", alerts_path %></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Account & Admin</h4>
+        <ul>
+          <% if logged_in? %>
+            <li><%= link_to "My Trips Dashboard", trips_path %></li>
+            <li><%= link_to "Profile & Preferences", profile_path %></li>
+            <% if current_user.admin? %>
+              <li><%= link_to "Admin Management Portal", admin_root_path %></li>
+            <% end %>
+          <% else %>
+            <li><%= link_to "Login to Account", login_path %></li>
+            <li><%= link_to "Create Free Account", signup_path %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© <%= Time.current.year %> TravelMaster. Built with Ruby on Rails 8 and MySQL. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

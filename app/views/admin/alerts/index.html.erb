@@ -1,0 +1,43 @@
+<% content_for :title, "System Alerts - Admin" %>
+
+<div>
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🔔 Broadcast & System Alerts</h1>
+      <p class="section-subtitle">Issue safety advisories, weather warnings, and route updates to users</p>
+    </div>
+    <%= link_to "+ Broadcast New Alert", new_admin_alert_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Title & Message</th>
+          <th>Destination</th>
+          <th>Severity</th>
+          <th>Posted At</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @alerts.each do |alert| %>
+          <tr>
+            <td><span class="badge badge-muted"><%= alert.type_icon %> <%= alert.alert_type %></span></td>
+            <td>
+              <strong><%= alert.title %></strong>
+              <div style="font-size: 0.85rem; color: var(--text-muted);"><%= alert.message.truncate(80) %></div>
+            </td>
+            <td><%= alert.destination&.name.presence || "Global / All" %></td>
+            <td><span class="badge badge-<%= alert.severity == 'warning' ? 'warning' : 'primary' %>"><%= alert.severity.upcase %></span></td>
+            <td><%= alert.created_at.strftime("%b %d, %H:%M") %></td>
+            <td style="text-align: right;">
+              <%= button_to "Delete", admin_alert_path(alert), method: :delete, data: { turbo_confirm: "Delete alert?" }, class: "btn btn-danger btn-sm" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "Admin Portal - TravelMaster" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :application, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <style>
+      .admin-layout {
+        display: flex;
+        min-height: calc(100vh - 70px);
+      }
+      .admin-sidebar {
+        width: 260px;
+        background: #0f172a;
+        color: white;
+        padding: 1.5rem 1rem;
+        flex-shrink: 0;
+      }
+      .admin-sidebar-nav {
+        list-style: none;
+        margin-top: 1rem;
+      }
+      .admin-sidebar-nav li {
+        margin-bottom: 0.4rem;
+      }
+      .admin-sidebar-nav a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #94a3b8;
+        padding: 0.7rem 1rem;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+      .admin-sidebar-nav a:hover, .admin-sidebar-nav a.active {
+        color: white;
+        background: #1e293b;
+      }
+      .admin-body {
+        flex: 1;
+        padding: 2rem;
+        background: #f8fafc;
+      }
+    </style>
+  </head>
+
+  <body>
+    <%= render "shared/navbar" %>
+    <%= render "shared/flash" %>
+
+    <div class="admin-layout">
+      <aside class="admin-sidebar">
+        <div style="padding: 0 1rem 1rem; border-bottom: 1px solid #1e293b;">
+          <h3 style="font-size: 1.1rem; color: white; font-weight: 700;">⚙️ Admin Control</h3>
+          <p style="font-size: 0.8rem; color: #64748b;">Manage system catalog & data</p>
+        </div>
+
+        <ul class="admin-sidebar-nav">
+          <li><%= link_to "📊 Dashboard Overview", admin_root_path %></li>
+          <li><%= link_to "📍 Destinations Catalog", admin_destinations_path %></li>
+          <li><%= link_to "🏨 Hotels Management", admin_hotels_path %></li>
+          <li><%= link_to "🚗 Transport & Routes", admin_transports_path %></li>
+          <li><%= link_to "🛣️ Road Segments", admin_routes_infos_path %></li>
+          <li><%= link_to "👤 Users & Accounts", admin_users_path %></li>
+          <li><%= link_to "🔔 Broadcast Alerts", admin_alerts_path %></li>
+          <li style="margin-top: 2rem; border-top: 1px solid #1e293b; padding-top: 1rem;">
+            <%= link_to "← Return to Public Site", root_path, style: "color: #38bdf8;" %>
+          </li>
+        </ul>
+      </aside>
+
+      <div class="admin-body">
+        <%= yield %>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+<% content_for :title, "7-Day Weather Forecast - #{@destination.name}" %>
+
+<div class="container-sm">
+  <div class="card" style="padding: 2.25rem;">
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.25rem;">🌦️ Weather Intelligence: <%= @destination.name %></h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">📍 <%= @destination.city %>, <%= @destination.country %></p>
+    </div>
+
+    <!-- Packing & Advisory Alert -->
+    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 2rem; color: #1e40af; font-size: 0.95rem;">
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;">💡 Travel Packing & Weather Advisory</h3>
+      <p><%= @advice %></p>
+    </div>
+
+    <!-- Multi-day Forecast List -->
+    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">7-Day Extended Forecast</h2>
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;">
+      <% @forecasts.each do |wf| %>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: white;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="font-size: 2rem;"><%= wf.condition_icon %></div>
+            <div>
+              <div style="font-weight: 700; font-size: 1rem;"><%= wf.forecast_date.strftime("%A, %B %d") %></div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);"><%= wf.condition %> • Humidity <%= wf.humidity %>% • Wind <%= wf.wind_speed_kmh %> km/h</div>
+            </div>
+          </div>
+
+          <div style="text-align: right;">
+            <div style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);"><%= wf.temperature_celsius %>°C</div>
+            <div style="font-size: 0.8rem; color: #2563eb;">💧 <%= wf.rainfall_prob %>% Rain Chance</div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <%= link_to "← Back to Weather Overview", weather_index_path, class: "btn btn-secondary" %>
+      <%= link_to "Plan Trip to #{@destination.name}", new_trip_path(destination_ids: [@destination.id]), class: "btn btn-primary" %>
+    </div>
+  </div>
+</div>

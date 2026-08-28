@@ -1,0 +1,85 @@
+<% content_for :title, "Hotels & Stays - TravelMaster" %>
+
+<div class="container">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🏨 Hotels & Accommodations</h1>
+      <p class="section-subtitle">Compare hotels, luxury resorts, boutique stays, and budget rooms</p>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <form action="<%= hotels_path %>" method="get" class="filter-bar">
+    <div class="filter-group">
+      <input type="text" name="q" value="<%= params[:q] %>" placeholder="Search hotel name..." class="form-control" style="width: 220px;">
+
+      <select name="destination_id" class="form-control" style="width: 200px;">
+        <option value="">All Destinations</option>
+        <% @destinations.each do |d| %>
+          <option value="<%= d.id %>" <%= "selected" if params[:destination_id].to_s == d.id.to_s %>><%= d.name %> (<%= d.city %>)</option>
+        <% end %>
+      </select>
+
+      <select name="tier" class="form-control" style="width: 160px;">
+        <option value="">All Budget Tiers</option>
+        <option value="budget" <%= "selected" if params[:tier] == "budget" %>>Budget (< $100)</option>
+        <option value="mid_range" <%= "selected" if params[:tier] == "mid_range" %>>Mid-Range ($100-$250)</option>
+        <option value="luxury" <%= "selected" if params[:tier] == "luxury" %>>Luxury (> $250)</option>
+      </select>
+
+      <select name="stars" class="form-control" style="width: 140px;">
+        <option value="">Star Rating</option>
+        <option value="5" <%= "selected" if params[:stars] == "5" %>>5 Stars ⭐⭐⭐⭐⭐</option>
+        <option value="4" <%= "selected" if params[:stars] == "4" %>>4 Stars ⭐⭐⭐⭐</option>
+        <option value="3" <%= "selected" if params[:stars] == "3" %>>3 Stars ⭐⭐⭐</option>
+      </select>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <%= link_to "Reset", hotels_path, class: "btn btn-secondary" %>
+    </div>
+  </form>
+
+  <!-- Hotels Grid -->
+  <% if @hotels.any? %>
+    <div class="grid-3">
+      <% @hotels.each do |hotel| %>
+        <div class="card">
+          <div class="card-img-wrapper" style="height: 180px;">
+            <img src="<%= hotel.image_url.presence || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=80' %>" alt="<%= hotel.name %>">
+            <span class="card-badge-top-left"><%= hotel.budget_tier %></span>
+            <span class="card-badge-top-right">⭐ <%= hotel.star_rating %> Stars</span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title" style="font-size: 1.15rem;"><%= link_to hotel.name, hotel_path(hotel) %></h3>
+            <div class="card-meta">
+              <span>📍 <%= hotel.destination.city %>, <%= hotel.destination.country %></span>
+            </div>
+            <p class="card-text"><%= hotel.description.truncate(95) %></p>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem;">
+              <% hotel.amenities_list.take(3).each do |amenity| %>
+                <span class="badge badge-muted" style="font-size: 0.75rem;">✨ <%= amenity %></span>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Per Night</span><br>
+              <strong style="font-size: 1.2rem; color: var(--primary);">$<%= hotel.price_per_night %></strong>
+            </div>
+            <%= link_to "View Stay & Book →", hotel_path(hotel), class: "btn btn-primary btn-sm" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="card" style="padding: 3rem; text-align: center;">
+      <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1rem;">No hotels found matching criteria.</p>
+      <%= link_to "View All Hotels", hotels_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,56 @@
+<% content_for :title, "#{@route.route_name} - Route Planning & Road Conditions" %>
+
+<div class="container-sm">
+  <div class="card" style="padding: 2.25rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 1.7rem; font-weight: 800;"><%= @route.route_name %></h1>
+        <p style="color: var(--text-muted); font-size: 1rem;">📍 <%= @route.origin_city %> ➔ <%= @route.destination_city %></p>
+      </div>
+
+      <span class="badge badge-<%= @route.road_condition == 'Excellent' ? 'success' : 'primary' %>" style="font-size: 0.9rem; padding: 6px 12px;">
+        <%= @route.road_condition %> Road Quality
+      </span>
+    </div>
+
+    <!-- Highway Stats Grid -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
+      <div style="background: var(--bg-page); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Total Distance</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--text-main);"><%= @route.distance_km %> km</div>
+      </div>
+
+      <div style="background: var(--bg-page); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Estimated Driving Duration</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--text-main);"><%= @route.formatted_drive_time %></div>
+      </div>
+
+      <div style="background: var(--bg-page); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Estimated Fuel Cost (8.5L/100km)</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary);">$<%= @route.estimated_fuel_cost %></div>
+      </div>
+
+      <div style="background: var(--bg-page); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Highway Tolls</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary);">$<%= @route.toll_charges %></div>
+      </div>
+    </div>
+
+    <div style="border-top: 1px solid var(--border-light); padding-top: 1.5rem; margin-bottom: 2rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">Route Intelligence & Advisory</h3>
+      <p style="color: #334155; line-height: 1.7; font-size: 0.95rem; margin-bottom: 1rem;">
+        <%= @route.route_highlights %>
+      </p>
+
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.9rem; color: var(--text-muted);">
+        <span>🚦 Current Traffic: <strong><%= @route.traffic_level %></strong></span>
+        <span>🌄 Scenic Rating: <strong><%= "★" * @route.scenic_score %> (<%= @route.scenic_score %>/5)</strong></span>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <%= link_to "← Back to Routes", routes_path, class: "btn btn-secondary" %>
+      <%= link_to "Plan Trip with this Route", cost_estimators_path(origin_city: @route.origin_city), class: "btn btn-primary" %>
+    </div>
+  </div>
+</div>

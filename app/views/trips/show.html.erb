@@ -1,0 +1,202 @@
+<% content_for :title, "#{@trip.title} - Trip Overview" %>
+
+<div class="container">
+  <!-- Trip Header -->
+  <div class="card" style="padding: 2rem; margin-bottom: 2rem; background: white;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+          <h1 style="font-size: 1.85rem; font-weight: 800;"><%= @trip.title %></h1>
+          <span class="badge badge-muted"><%= @trip.trip_type %></span>
+          <span class="badge badge-primary"><%= @trip.status %></span>
+        </div>
+
+        <div style="font-size: 0.95rem; color: var(--text-muted); display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+          <span>📅 <strong><%= @trip.start_date.strftime("%b %d, %Y") %></strong> to <strong><%= @trip.end_date.strftime("%b %d, %Y") %></strong> (<%= @trip.duration_days %> days)</span>
+          <span>👥 <strong><%= @trip.number_of_travelers %></strong> <%= "traveler".pluralize(@trip.number_of_travelers) %></span>
+        </div>
+
+        <p style="color: #475569; font-size: 0.95rem;">
+          <%= @trip.notes.presence || "No special notes recorded." %>
+        </p>
+      </div>
+
+      <!-- Cost Summary Card -->
+      <div class="estimate-metric-box" style="min-width: 280px;">
+        <div class="estimate-metric-label">Estimated Total Budget</div>
+        <div class="estimate-metric-number">$<%= number_with_precision(@trip.total_estimated_cost, precision: 2) %></div>
+        <div style="font-size: 0.85rem; color: #1e40af;">
+          ~$<%= number_with_precision((@trip.total_estimated_cost / @trip.number_of_travelers.to_f), precision: 2) %> / traveler
+        </div>
+        <% if @trip.target_budget.present? && @trip.target_budget > 0 %>
+          <div style="margin-top: 0.5rem; font-size: 0.85rem; font-weight: 600; color: <%= @trip.budget_variance >= 0 ? '#166534' : '#991b1b' %>;">
+            Target: $<%= @trip.target_budget %> (<%= @trip.budget_status %>)
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Navigation & Action Buttons -->
+    <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <%= link_to "🗓️ Day-by-Day Itinerary", itinerary_trip_path(@trip), class: "btn btn-primary" %>
+        <%= link_to "📊 Cost Breakdown", cost_breakdown_trip_path(@trip), class: "btn btn-secondary" %>
+        <%= link_to "🖨️ Export / Print PDF", print_view_trip_path(@trip), class: "btn btn-outline", target: "_blank" %>
+      </div>
+
+      <!-- Recalculate Tier Bar -->
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Auto-Estimate Tier:</span>
+        <%= button_to "Budget", auto_estimate_trip_path(@trip, tier: "budget"), method: :post, class: "btn btn-outline btn-sm" %>
+        <%= button_to "Moderate", auto_estimate_trip_path(@trip, tier: "moderate"), method: :post, class: "btn btn-outline btn-sm" %>
+        <%= button_to "Luxury", auto_estimate_trip_path(@trip, tier: "luxury"), method: :post, class: "btn btn-outline btn-sm" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Destinations in this Trip -->
+  <div style="margin-bottom: 2.5rem;">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Destinations & Route Stops</h2>
+        <p class="section-subtitle">Live weather conditions and crowd levels for each stop on your journey</p>
+      </div>
+    </div>
+
+    <% if @destinations.any? %>
+      <div class="grid-3">
+        <% @destinations.each_with_index do |dest, idx| %>
+          <div class="card">
+            <div class="card-img-wrapper" style="height: 150px;">
+              <img src="<%= dest.image_url.presence || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&auto=format&fit=crop&q=80' %>" alt="<%= dest.name %>">
+              <span class="card-badge-top-left">Stop <%= idx + 1 %></span>
+              <span class="card-badge-top-right">⭐ <%= dest.rating %></span>
+            </div>
+
+            <div class="card-body">
+              <h3 class="card-title" style="font-size: 1.1rem;"><%= link_to dest.name, destination_path(dest) %></h3>
+              <div class="card-meta">📍 <%= dest.city %>, <%= dest.country %></div>
+
+              <!-- Weather & Crowd -->
+              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.4rem;">
+                <% if dest.current_weather %>
+                  <span class="badge badge-primary">
+                    <%= dest.current_weather.condition_icon %> <%= dest.current_weather.temperature_celsius %>°C (<%= dest.current_weather.condition %>)
+                  </span>
+                <% end %>
+
+                <% if dest.current_crowd %>
+                  <span class="badge badge-<%= dest.current_crowd.crowd_level == 'High' ? 'warning' : 'success' %>">
+                    👥 <%= dest.current_crowd.crowd_level %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <%= link_to "Find Hotels in #{dest.city}", hotels_path(destination_id: dest.id), style: "font-size: 0.85rem;" %>
+              <%= link_to "View Destination", destination_path(dest), class: "btn btn-secondary btn-sm" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="card" style="padding: 2rem; text-align: center;">
+        <p style="color: var(--text-muted);">No destinations attached to this trip yet.</p>
+        <%= link_to "Add Destinations to Trip", edit_trip_path(@trip), class: "btn btn-primary btn-sm", style: "margin-top: 0.75rem;" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Itemized Expenses & Bookings Table -->
+  <div class="card" style="padding: 2rem; margin-bottom: 3rem;">
+    <div class="section-header" style="margin-bottom: 1.25rem;">
+      <div>
+        <h2 class="section-title" style="font-size: 1.35rem;">Itemized Expenses & Reservations</h2>
+        <p class="section-subtitle">Track accommodations, transportation tickets, meals, fuel/tolls, and activities</p>
+      </div>
+    </div>
+
+    <% if @bookings.any? %>
+      <table class="data-table" style="margin-bottom: 2rem;">
+        <thead>
+          <tr>
+            <th>Item Category</th>
+            <th>Description / Details</th>
+            <th>Unit Cost</th>
+            <th>Qty</th>
+            <th>Total Cost</th>
+            <th>Status</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @bookings.each do |b| %>
+            <tr>
+              <td><strong><%= b.category_label %></strong></td>
+              <td>
+                <div><%= b.title %></div>
+                <% if b.details.present? %>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);"><%= b.details %></div>
+                <% end %>
+              </td>
+              <td>$<%= number_with_precision(b.unit_cost, precision: 2) %></td>
+              <td><%= b.quantity %></td>
+              <td style="font-weight: 700; color: var(--primary);">$<%= number_with_precision(b.total_cost, precision: 2) %></td>
+              <td>
+                <span class="badge badge-<%= b.booking_status == 'confirmed' ? 'success' : (b.booking_status == 'reserved' ? 'primary' : 'muted') %>">
+                  <%= b.booking_status.capitalize %>
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <%= button_to "✕", trip_trip_booking_path(@trip, b), method: :delete, data: { turbo_confirm: "Remove expense?" }, class: "btn btn-outline btn-sm", style: "padding: 2px 8px; color: var(--danger);" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div style="padding: 1.5rem; text-align: center; color: var(--text-muted);">
+        No itemized expenses added yet. Use the quick expense form below or auto-estimate above.
+      </div>
+    <% end %>
+
+    <!-- Add Custom Expense Form -->
+    <div style="background: var(--bg-page); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">+ Add Custom Expense or Booking</h3>
+
+      <%= form_with model: [@trip, @new_booking], local: true do |f| %>
+        <div style="display: grid; grid-template-columns: 180px 2fr 120px 80px 140px auto; gap: 0.75rem; align-items: end;">
+          <div>
+            <%= f.label :item_type, "Category", class: "form-label", style: "font-size: 0.8rem;" %>
+            <%= f.select :item_type, [["Hotel / Stay", "hotel"], ["Transport / Fare", "transport"], ["Food / Meals", "food"], ["Toll / Fuel", "toll_fuel"], ["Activity / Tour", "activity"], ["Custom", "custom"]], {}, class: "form-control", style: "font-size: 0.85rem;" %>
+          </div>
+
+          <div>
+            <%= f.label :title, "Expense Title", class: "form-label", style: "font-size: 0.8rem;" %>
+            <%= f.text_field :title, placeholder: "e.g. High-speed bullet train ticket", class: "form-control", style: "font-size: 0.85rem;", required: true %>
+          </div>
+
+          <div>
+            <%= f.label :unit_cost, "Unit Price ($)", class: "form-label", style: "font-size: 0.8rem;" %>
+            <%= f.number_field :unit_cost, step: "0.01", placeholder: "0.00", class: "form-control", style: "font-size: 0.85rem;", required: true %>
+          </div>
+
+          <div>
+            <%= f.label :quantity, "Qty", class: "form-label", style: "font-size: 0.8rem;" %>
+            <%= f.number_field :quantity, value: 1, min: 1, class: "form-control", style: "font-size: 0.85rem;", required: true %>
+          </div>
+
+          <div>
+            <%= f.label :booking_status, "Status", class: "form-label", style: "font-size: 0.8rem;" %>
+            <%= f.select :booking_status, [["Estimated", "estimated"], ["Reserved", "reserved"], ["Confirmed", "confirmed"]], {}, class: "form-control", style: "font-size: 0.85rem;" %>
+          </div>
+
+          <div>
+            <%= f.submit "+ Add Item", class: "btn btn-primary btn-sm", style: "height: 38px; width: 100%;" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

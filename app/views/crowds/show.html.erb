@@ -1,0 +1,52 @@
+<% content_for :title, "Crowd Analysis - #{@destination.name}" %>
+
+<div class="container-sm">
+  <div class="card" style="padding: 2.25rem;">
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.25rem;">👥 Crowd Intensity & Seasonal Trends</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">📍 <%= @destination.name %> (<%= @destination.city %>, <%= @destination.country %>)</p>
+    </div>
+
+    <!-- Live Season Status -->
+    <div class="estimate-metric-box" style="margin-bottom: 2rem; background: white; border-color: var(--border-color);">
+      <div class="estimate-metric-label">Current Season Intensity</div>
+      <div style="font-size: 2.2rem; font-weight: 800; color: <%= @analysis[:level] == 'High' ? 'var(--warning)' : 'var(--success)' %>; margin: 0.25rem 0;">
+        <%= @analysis[:level] %> (<%= @analysis[:percentage] %>%)
+      </div>
+      <div style="font-size: 0.9rem; color: var(--text-muted);">
+        Season: <strong><%= @analysis[:season_type] %></strong> • Est. Hotel Occupancy: <strong><%= @analysis[:occupancy] %>%</strong>
+      </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 2rem; color: #92400e; font-size: 0.95rem;">
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;">💡 Peak Avoidance & Savings Advice</h3>
+      <p style="margin-bottom: 0.5rem;"><%= @analysis[:best_time_advice] %></p>
+      <p style="font-size: 0.85rem; color: #78350f;"><strong>Booking Note:</strong> <%= @analysis[:recommendations] %></p>
+    </div>
+
+    <!-- Seasonal Matrix -->
+    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">Seasonal Quarter Forecasts</h2>
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;">
+      <% @forecasts.each do |cf| %>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: white;">
+          <div>
+            <div style="font-weight: 700; font-size: 1rem;"><%= cf.month_or_season %></div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);"><%= cf.season_type %> • Occupancy ~<%= cf.average_hotel_occupancy %>%</div>
+          </div>
+
+          <div style="text-align: right;">
+            <span class="badge badge-<%= cf.crowd_level == 'High' ? 'warning' : 'success' %>">
+              <%= cf.crowd_level %> (<%= cf.intensity_percentage %>%)
+            </span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <%= link_to "← Back to Crowd Index", crowds_path, class: "btn btn-secondary" %>
+      <%= link_to "Plan Trip to #{@destination.name}", new_trip_path(destination_ids: [@destination.id]), class: "btn btn-primary" %>
+    </div>
+  </div>
+</div>
