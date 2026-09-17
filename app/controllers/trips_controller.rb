@@ -139,6 +139,6 @@ class TripsController < ApplicationController
   end
 
   def trip_params
-    params.require(:trip).permit(:title, :trip_type, :start_date, :end_date, :number_of_travelers, :budget_currency, :target_budget, :notes, :status)
+    params.expect(trip: [:title, :trip_type, :start_date, :end_date, :number_of_travelers])
   end
 end
