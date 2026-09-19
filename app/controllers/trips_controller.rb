@@ -31,6 +31,7 @@ class TripsController < ApplicationController
   end
 
   def create
+    debugger #Yahan degugger lagaya hai 
     @trip = current_user.trips.build(trip_params)
 
     if @trip.save
