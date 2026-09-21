@@ -60,14 +60,7 @@ Rails.application.routes.draw do
     end
   end
 
-  # Administration Portal
-  namespace :admin do
-    root to: "dashboard#index"
-    resources :destinations
-    resources :hotels
-    resources :transports
-    resources :routes_infos
-    resources :users
-    resources :alerts
-  end
+
+ # Administration Portal
+draw :admin
 end
