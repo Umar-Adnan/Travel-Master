@@ -6,6 +6,8 @@ class TripsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_trip, only: [:show, :edit, :update, :destroy, :itinerary, :cost_breakdown, :auto_estimate, :print_view]
 
+
+
   def index
     @trips = current_user.trips.order(start_date: :asc)
     @upcoming_trips = @trips.upcoming
