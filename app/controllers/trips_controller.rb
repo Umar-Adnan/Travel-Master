@@ -12,6 +12,9 @@ class TripsController < ApplicationController
     @trips = current_user.trips.order(start_date: :asc)
     @upcoming_trips = @trips.upcoming
     @past_trips = @trips.past
+    # @trips = []
+    # @upcoming_trips = [] Done for Video Demonstration.
+    # @past_trips = []
   end
 
   def show
